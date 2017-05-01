@@ -8,6 +8,7 @@ package jmb.jcortex.trainers;
 import jmb.jcortex.data.SynMatrix;
 import jmb.jcortex.neuralnet.NeuralNet;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,9 +17,8 @@ import java.util.List;
  */
 public class DeltaCalculator {
 
-    public List<SynMatrix> calcDeltas(List<SynMatrix> nodeValues, SynMatrix labels, NeuralNet neuralNet)
-    {
-        List<SynMatrix> layers = neuralNet.getLayers();
+    public List<SynMatrix> calcDeltas(List<SynMatrix> nodeValues, SynMatrix labels, NeuralNet neuralNet) {
+        List<SynMatrix> layers = new ArrayList<>(neuralNet.getLayers());
         SynMatrix[] deltas = new SynMatrix[layers.size()];
         SynMatrix outputs = nodeValues.get(nodeValues.size() - 1);
         deltas[deltas.length - 1] = outputs.minus(labels).elementMultInPlace(outputs.apply(neuralNet.getOutputFunction().getDerivative()));

@@ -5,10 +5,12 @@
  */
 package jmb.jcortex.trainers;
 
+import com.codepoetics.protonpack.StreamUtils;
 import jmb.jcortex.data.SynMatrix;
 
-import java.util.Arrays;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  *
@@ -16,23 +18,12 @@ import java.util.List;
 public class GradientCalculator {
 
     public List<SynMatrix> calcGradients(List<SynMatrix> deltasList, List<SynMatrix> nodeValuesList) {
-        SynMatrix[] nodeValues = nodeValuesList.toArray(new SynMatrix[nodeValuesList.size()]);
-        SynMatrix[] deltas = deltasList.toArray(new SynMatrix[deltasList.size()]);
-        SynMatrix[] gradients = new SynMatrix[deltas.length];
-        for (int i = 0; i < deltas.length; i++) {
-            gradients[i] = nodeValues[i].addBiasColumn().transpose().multiply(deltas[i]).elementDivideInPlace(deltas[i].numRows());
-        }
-        return Arrays.asList(gradients);
+        return StreamUtils.zip(deltasList.stream(), nodeValuesList.stream(), this::calcPartialDerivativeGradient)
+                .collect(toList());
     }
 
-//
-//        return StreamUtils.zip(deltas.stream(), nodeValues.stream(), this::calcPartialDerivativeGradient)
-//                .collect(toList());
-//    }
-//
-//    private SynMatrix calcPartialDerivativeGradient(SynMatrix deltas, SynMatrix nodeValues) {
-//        Theta2_grad = (Delta3' * A) ./ m;
-//        return nodeValues.addBiasColumn().transpose().multiply(deltas).elementDivideInPlace(deltas.numRows());
-//    }
+    private SynMatrix calcPartialDerivativeGradient(SynMatrix deltas, SynMatrix nodeValues) {
+        return nodeValues.addBiasColumn().transpose().multiply(deltas).elementDivideInPlace(deltas.numRows());
+    }
 
 }
