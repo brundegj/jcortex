@@ -44,6 +44,12 @@
 			<version>1.13</version>
 		</dependency>
 
+		<dependency>
+		    <groupId>org.knowm.xchart</groupId>
+		    <artifactId>xchart</artifactId>
+		    <version>3.3.0</version>
+		</dependency>
+
 		<!-- Test Dependencies -->
 		<dependency>
 			<groupId>junit</groupId>

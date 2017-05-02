@@ -8,22 +8,23 @@ package jmb.jcortex.strategies.haltingstrategies;
 import jmb.jcortex.data.DataSet;
 import jmb.jcortex.neuralnet.NeuralNet;
 import jmb.jcortex.strategies.performanceevaluators.PerformanceEvaluator;
+import jmb.jcortex.strategies.performanceevaluators.PerformanceListener;
 
-import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static java.lang.String.format;
+import static jmb.jcortex.JCortexConstants.TRAINING_SET_PERCENT_WRONG;
+import static jmb.jcortex.JCortexConstants.VALIDATION_SET_PERCENT_WRONG;
 
 public class ValidationSetHaltingStrategy implements HaltingStrategy {
-    public static final NumberFormat ONE_DECIMAL = NumberFormat.getNumberInstance();
-    static {
-        ONE_DECIMAL.setMinimumFractionDigits(1);
-        ONE_DECIMAL.setMaximumFractionDigits(1);
-    }
 
     private final DataSet validationSet;
     private final DataSet trainingSet;
     private final int maxIterationSinceBestResult;
     private final PerformanceEvaluator performanceEvaluator;
+    private List<PerformanceListener> performanceListeners = new ArrayList<>();
 
     private NeuralNet best;
     private int iterationsSinceBest = 0;
@@ -58,9 +59,12 @@ public class ValidationSetHaltingStrategy implements HaltingStrategy {
     }
 
     private void reportPerformance(double trainingSetError, double validationSetError) {
-        // FIXME add logging or event listeners
-//        System.out.println(format("Training set %% wrong: %s \tValidation set %% wrong: %s",
-//                ONE_DECIMAL.format(trainingSetError * 100), ONE_DECIMAL.format(validationSetError * 100)));
+        if (performanceListeners.isEmpty()) return;
+
+        Map<String, Double> performanceData = new HashMap<>();
+        performanceData.put(TRAINING_SET_PERCENT_WRONG, trainingSetError);
+        performanceData.put(VALIDATION_SET_PERCENT_WRONG, validationSetError);
+        performanceListeners.forEach(listener -> listener.performanceEvent(performanceData));
     }
 
     @Override
@@ -68,4 +72,7 @@ public class ValidationSetHaltingStrategy implements HaltingStrategy {
         return best;
     }
 
+    public void addPerformanceListener(PerformanceListener performanceListener) {
+        performanceListeners.add(performanceListener);
+    }
 }
