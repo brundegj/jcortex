@@ -46,7 +46,7 @@ public class MnistDigitsIntegrationTest {
 
         SupervisedTrainer trainer = GradientDescentTrainerBuilder.createTrainer()
                 .withBatchingStrategy(new FixedNumBatchingStrategy(100))
-                .withOptimizationStrategy(new MomentumOptimizationStrategy(0.08, 0.5))
+                .withOptimizationStrategy(new MomentumOptimizationStrategy(0.08, 0.9))
                 .withHaltingStrategy(haltingStrategy)
                 .build();
 

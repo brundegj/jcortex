@@ -36,4 +36,9 @@ public class MomentumOptimizationStrategy implements OptimizationStrategy {
         previousCorrections = corrections;
         return corrections;
     }
+
+    @Override
+    public double getLearningRate() {
+        return learningRate;
+    }
 }

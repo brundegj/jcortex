@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  *
  */
-public class BooleanTest {
+public class BooleanIntegrationTest {
 
     @Test
     public void shouldComputeBooleanTrue() {
@@ -138,12 +138,11 @@ public class BooleanTest {
                 .withActivationFunction(SIGMOID_MATRIX_FUNCTION)
                 .withOutputFunction(LINEAR_MATRIX_FUNCTION)
                 .withWeightInitializer(new LinearRandomWeightInitializer(-0.8, 0.8))
-//                .withWeightInitializer(new FixedWeightInitializer())
                 .build();
 
         SupervisedTrainer trainer = GradientDescentTrainerBuilder.createTrainer()
                 .withBatchingStrategy(new FullTrainingSetBatchingStrategy())
-                .withOptimizationStrategy(new MomentumOptimizationStrategy(0.5, 0.5))
+                .withOptimizationStrategy(new MomentumOptimizationStrategy(0.5, 0.9))
                 .withHaltingStrategy(new ValidationSetHaltingStrategy(dataSet, dataSet,
                         new ThresholdPerformanceEvaluator(0.5), 10000))
                 .build();

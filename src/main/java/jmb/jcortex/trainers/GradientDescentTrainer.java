@@ -13,15 +13,17 @@ import jmb.jcortex.strategies.batchingstrategies.BatchingStrategy;
 import jmb.jcortex.strategies.batchingstrategies.FixedNumBatchingStrategy;
 import jmb.jcortex.strategies.haltingstrategies.HaltingStrategy;
 import jmb.jcortex.strategies.optimizationstrategies.OptimizationStrategy;
+import jmb.jcortex.strategies.regularization.WeightAdjuster;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class GradientDescentTrainer implements SupervisedTrainer {
 
-    private final BatchingStrategy batchingStrategy;
-    private final OptimizationStrategy optimizationStrategy;
-    private final HaltingStrategy haltingStrategy;
+    private BatchingStrategy batchingStrategy;
+    private OptimizationStrategy optimizationStrategy;
+    private HaltingStrategy haltingStrategy;
+    private WeightAdjuster weightAdjuster;
 
     private DeltaCalculator deltaCalculator = new DeltaCalculator();
     private GradientCalculator gradientCalculator = new GradientCalculator();
@@ -59,15 +61,16 @@ public class GradientDescentTrainer implements SupervisedTrainer {
     private NeuralNet doBackPropagation(NeuralNet neuralNet, List<SynMatrix> nodeValues, SynMatrix labels) {
         List<SynMatrix> deltas = deltaCalculator.calcDeltas(nodeValues, labels, neuralNet);
         List<SynMatrix> gradients = gradientCalculator.calcGradients(deltas, nodeValues);
-        List<SynMatrix> newLayers = updateParameters(neuralNet.getLayers(), gradients);
+        List<SynMatrix> newLayers = updateParameters(neuralNet.getLayers(), gradients, labels.numRows());
         neuralNet.setLayers(newLayers);
         return neuralNet;
     }
 
-    private List<SynMatrix> updateParameters(List<SynMatrix> layers, List<SynMatrix> gradients) {
+    private List<SynMatrix> updateParameters(List<SynMatrix> layers, List<SynMatrix> gradients, int numExamples) {
         SynMatrix[] corrections = optimizationStrategy.calcCorrections(gradients).toArray(new SynMatrix[0]);
         SynMatrix[] weights = layers.toArray(new SynMatrix[layers.size()]);
         for (int i = 0; i < corrections.length; i++) {
+            weights[i] = applyRegularization(weights[i], numExamples);
             weights[i].minusInPlace(corrections[i]);
         }
         return Arrays.asList(weights);
@@ -75,6 +78,14 @@ public class GradientDescentTrainer implements SupervisedTrainer {
 //        List<SynMatrix> corrections = optimizationStrategy.calcCorrections(gradients);
 //        List<SynMatrix> newWeights = StreamUtils.zip(weights.stream(), corrections.stream(), SynMatrix::minusInPlace).collect(toList());
 //        return newWeights;
+    }
+
+    private SynMatrix applyRegularization(SynMatrix weights, int numExamples) {
+        if (weightAdjuster != null) {
+            double learningRate = optimizationStrategy.getLearningRate();
+            weights = weightAdjuster.adjustWeights(weights, numExamples, learningRate);
+        }
+        return weights;
     }
 
     public BatchingStrategy getBatchingStrategy() {
@@ -103,5 +114,13 @@ public class GradientDescentTrainer implements SupervisedTrainer {
 
     public void setGradientCalculator(GradientCalculator gradientCalculator) {
         this.gradientCalculator = gradientCalculator;
+    }
+
+    public WeightAdjuster getWeightAdjuster() {
+        return weightAdjuster;
+    }
+
+    public void setWeightAdjuster(WeightAdjuster weightAdjuster) {
+        this.weightAdjuster = weightAdjuster;
     }
 }

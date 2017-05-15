@@ -3,7 +3,7 @@
  * Date: 2017-05-01
  * MIT license: https://opensource.org/licenses/MIT
  */
-package jmb.jcortex.demos;
+package jmb.jcortex.demos.mnist;
 
 import jmb.jcortex.data.DataSet;
 import jmb.jcortex.data.DataSetSplitter;
@@ -12,10 +12,12 @@ import jmb.jcortex.neuralnet.NeuralNet;
 import jmb.jcortex.neuralnet.NeuralNetBuilder;
 import jmb.jcortex.strategies.batchingstrategies.FixedNumBatchingStrategy;
 import jmb.jcortex.strategies.haltingstrategies.ValidationSetHaltingStrategy;
+import jmb.jcortex.strategies.optimizationstrategies.FixedLearningRateOptimizationStrategy;
 import jmb.jcortex.strategies.optimizationstrategies.MomentumOptimizationStrategy;
 import jmb.jcortex.strategies.performanceevaluators.ChartingPerformanceListener;
 import jmb.jcortex.strategies.performanceevaluators.ClassificationPerformanceEvaluator;
 import jmb.jcortex.strategies.performanceevaluators.PrintlnPerformanceListener;
+import jmb.jcortex.strategies.regularization.L2Regularization;
 import jmb.jcortex.strategies.weightinitializers.LinearRandomWeightInitializer;
 import jmb.jcortex.trainers.GradientDescentTrainerBuilder;
 import jmb.jcortex.trainers.SupervisedTrainer;
@@ -26,10 +28,10 @@ import static jmb.jcortex.mapfunctions.MatrixFunctions.SOFTMAX_MATRIX_FUNCTION;
 /**
  *
  */
-public class MNISTOvertrainingDemo {
+public class MnistOvertrainingDemo {
 
     public static void main(String[] args) {
-        MNISTOvertrainingDemo demo = new MNISTOvertrainingDemo();
+        MnistOvertrainingDemo demo = new MnistOvertrainingDemo();
         demo.runDemo();
     }
 
@@ -37,7 +39,6 @@ public class MNISTOvertrainingDemo {
         DataSet[] sets = loadData();
         DataSet training = sets[0];
         DataSet validation = sets[1];
-        DataSet testing = sets[2];
 
         NeuralNet untrainedNetwork = NeuralNetBuilder.createNeuralNet()
                 .withDimensions(784, 200, 200, 10)
@@ -53,8 +54,9 @@ public class MNISTOvertrainingDemo {
 
         SupervisedTrainer trainer = GradientDescentTrainerBuilder.createTrainer()
                 .withBatchingStrategy(new FixedNumBatchingStrategy(100))
-                .withOptimizationStrategy(new MomentumOptimizationStrategy(0.08, 0.5))
+                .withOptimizationStrategy(new MomentumOptimizationStrategy(0.08, 0.7))
                 .withHaltingStrategy(haltingStrategy)
+                .withWeightAdjuster(new L2Regularization(4))
                 .build();
 
         trainer.train(untrainedNetwork, training);

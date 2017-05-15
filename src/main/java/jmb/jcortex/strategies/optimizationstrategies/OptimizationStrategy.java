@@ -13,4 +13,5 @@ public interface OptimizationStrategy {
 
     List<SynMatrix> calcCorrections(List<SynMatrix> gradients);
 
+    double getLearningRate();
 }

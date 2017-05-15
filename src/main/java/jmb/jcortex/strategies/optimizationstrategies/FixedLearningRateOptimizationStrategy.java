@@ -28,4 +28,9 @@ public class FixedLearningRateOptimizationStrategy implements OptimizationStrate
                 .map(gradient -> gradient.elementMult(learningRate))
                 .collect(toList());
     }
+
+    @Override
+    public double getLearningRate() {
+        return learningRate;
+    }
 }

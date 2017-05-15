@@ -10,12 +10,14 @@ import jmb.jcortex.strategies.batchingstrategies.FullTrainingSetBatchingStrategy
 import jmb.jcortex.strategies.haltingstrategies.HaltingStrategy;
 import jmb.jcortex.strategies.optimizationstrategies.MomentumOptimizationStrategy;
 import jmb.jcortex.strategies.optimizationstrategies.OptimizationStrategy;
+import jmb.jcortex.strategies.regularization.WeightAdjuster;
 
 public class GradientDescentTrainerBuilder {
 
     private BatchingStrategy batchingStrategy;
     private OptimizationStrategy optimizationStrategy;
     private HaltingStrategy haltingStrategy;
+    private WeightAdjuster weightAdjuster;
 
     public static GradientDescentTrainerBuilder createTrainer() {
         return new GradientDescentTrainerBuilder();
@@ -42,8 +44,15 @@ public class GradientDescentTrainerBuilder {
         return this;
     }
 
+    public GradientDescentTrainerBuilder withWeightAdjuster(WeightAdjuster weightAdjuster) {
+        this.weightAdjuster = weightAdjuster;
+        return this;
+    }
+
     public GradientDescentTrainer build() {
-        return new GradientDescentTrainer(batchingStrategy, optimizationStrategy, haltingStrategy);
+        GradientDescentTrainer trainer = new GradientDescentTrainer(batchingStrategy, optimizationStrategy, haltingStrategy);
+        trainer.setWeightAdjuster(weightAdjuster);
+        return trainer;
     }
 
 }
