@@ -16,6 +16,9 @@ public class MatrixFunctions {
     public static final DifferentiableMatrixFunction LINEAR_MATRIX_FUNCTION
             = new SimpleDifferentiableMatrixFunction(new IdentityFunction());
 
+    public static final DifferentiableMatrixFunction RECIFIED_LINEAR_MATRIX_FUNCTION
+            = new SimpleDifferentiableMatrixFunction(new RectifiedLinearActivationFunction());
+
     public static final DifferentiableMatrixFunction SOFTMAX_MATRIX_FUNCTION
             = new SimpleDifferentiableMatrixFunction(new SoftMaxActivationFunction(),
             new SimpleMatrixFunction(new IdentityFunction().getDerivative()));

@@ -22,6 +22,7 @@ import jmb.jcortex.strategies.weightinitializers.LinearRandomWeightInitializer;
 import jmb.jcortex.trainers.GradientDescentTrainerBuilder;
 import jmb.jcortex.trainers.SupervisedTrainer;
 
+import static jmb.jcortex.mapfunctions.MatrixFunctions.RECIFIED_LINEAR_MATRIX_FUNCTION;
 import static jmb.jcortex.mapfunctions.MatrixFunctions.SIGMOID_MATRIX_FUNCTION;
 import static jmb.jcortex.mapfunctions.MatrixFunctions.SOFTMAX_MATRIX_FUNCTION;
 
@@ -42,7 +43,7 @@ public class MnistOvertrainingDemo {
 
         NeuralNet untrainedNetwork = NeuralNetBuilder.createNeuralNet()
                 .withDimensions(784, 200, 200, 10)
-                .withActivationFunction(SIGMOID_MATRIX_FUNCTION)
+                .withActivationFunction(RECIFIED_LINEAR_MATRIX_FUNCTION)
                 .withOutputFunction(SOFTMAX_MATRIX_FUNCTION)
                 .withWeightInitializer(new LinearRandomWeightInitializer(-0.3, 0.3))
                 .build();
@@ -56,7 +57,6 @@ public class MnistOvertrainingDemo {
                 .withBatchingStrategy(new FixedNumBatchingStrategy(100))
                 .withOptimizationStrategy(new MomentumOptimizationStrategy(0.08, 0.7))
                 .withHaltingStrategy(haltingStrategy)
-                .withWeightAdjuster(new L2Regularization(4))
                 .build();
 
         trainer.train(untrainedNetwork, training);

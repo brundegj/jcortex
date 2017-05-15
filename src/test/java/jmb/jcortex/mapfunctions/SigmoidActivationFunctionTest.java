@@ -41,23 +41,4 @@ public class SigmoidActivationFunctionTest {
         assertThat(derivative.applyAsDouble(10)).isEqualTo(-90, precision);
     }
 
-
-//    @Test
-//    public void testApplyMatrix() {
-//        double[][] input = new double[][]{
-//                {-20, -10, -2},
-//                {-1, 0, 1},
-//                {2, 10, 20}
-//        };
-//        SynMatrix originalMatrix = new SynMatrix(input);
-//
-//        SynMatrix result = originalMatrix.apply(sigmoid);
-//
-//        assertThat(result.numRows()).isEqualTo(3);
-//        assertThat(result.numCols()).isEqualTo(3);
-//        assertThat(result.getRow(0)).containsExactly(new double[]{0, 0, 0.1192}, precision);
-//        assertThat(result.getRow(1)).containsExactly(new double[]{0.2689, 0.5, 0.7311}, precision);
-//        assertThat(result.getRow(2)).containsExactly(new double[]{0.8808, 1, 1}, precision);
-//    }
-
 }
