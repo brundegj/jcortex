@@ -52,7 +52,7 @@ public class GradientDescentTrainer implements SupervisedTrainer {
         BatchedDataSet batches = batchingStrategy.getBatchedDataSet(trainingSet);
         while(batches.hasNext()) {
             DataSet batch = batches.getNextBatch();
-            List<SynMatrix> nodeValues = neuralNet.doForwardPass(batch);
+            List<SynMatrix> nodeValues = neuralNet.trainForward(batch);
             neuralNet = doBackPropagation(neuralNet, nodeValues, batch.getLabels());
         }
         return neuralNet;
@@ -74,10 +74,6 @@ public class GradientDescentTrainer implements SupervisedTrainer {
             weights[i].minusInPlace(corrections[i]);
         }
         return Arrays.asList(weights);
-
-//        List<SynMatrix> corrections = optimizationStrategy.calcCorrections(gradients);
-//        List<SynMatrix> newWeights = StreamUtils.zip(weights.stream(), corrections.stream(), SynMatrix::minusInPlace).collect(toList());
-//        return newWeights;
     }
 
     private SynMatrix applyRegularization(SynMatrix weights, int numExamples) {

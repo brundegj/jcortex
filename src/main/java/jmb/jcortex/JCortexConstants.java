@@ -12,7 +12,7 @@ public final class JCortexConstants {
 
     public static final String TRAINING_SET_PERCENT_WRONG = "Training Set % Wrong";
     public static final String VALIDATION_SET_PERCENT_WRONG = "Validation Set % Wrong";
-
+    public static final String TEST_SET_PERCENT_WRONG = "Test Set % Wrong";
 
     private JCortexConstants(){}
 }

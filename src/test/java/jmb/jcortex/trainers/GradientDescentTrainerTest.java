@@ -120,7 +120,7 @@ public class GradientDescentTrainerTest {
         when(batch.hasNext()).thenReturn(true, false);  // one batch
         when(batch.getNextBatch()).thenReturn(trainingSet);
         when(trainingSet.getLabels()).thenReturn(labels);
-        when(startingNeuralNet.doForwardPass(trainingSet)).thenReturn(nodeValues);
+        when(startingNeuralNet.trainForward(trainingSet)).thenReturn(nodeValues);
         when(startingNeuralNet.getLayers()).thenReturn(layers);
         when(deltaCalculator.calcDeltas(nodeValues, labels, startingNeuralNet)).thenReturn(deltas);
         when(gradientCalculator.calcGradients(deltas, nodeValues)).thenReturn(gradients);

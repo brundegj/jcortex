@@ -12,6 +12,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
+import static jmb.jcortex.JCortexConstants.TEST_SET_PERCENT_WRONG;
 import static jmb.jcortex.JCortexConstants.TRAINING_SET_PERCENT_WRONG;
 import static jmb.jcortex.JCortexConstants.VALIDATION_SET_PERCENT_WRONG;
 
@@ -37,6 +38,11 @@ public class PrintlnPerformanceListener implements PerformanceListener {
         Double validationSetWrong = data.get(VALIDATION_SET_PERCENT_WRONG);
         if (validationSetWrong != null) {
             metrics.add(format("Validation set %% wrong: %s", formatPercent(validationSetWrong)));
+        }
+
+        Double testSetWrong = data.get(TEST_SET_PERCENT_WRONG);
+        if (testSetWrong != null) {
+            metrics.add(format("Test set %% wrong: %s", formatPercent(testSetWrong)));
         }
 
         if (!metrics.isEmpty()) {

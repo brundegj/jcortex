@@ -55,6 +55,11 @@ public class SynMatrix implements Copyable<SynMatrix>, Serializable {
         this.internalMatrix = new DoubleMatrix(rows, cols);
     }
 
+    public SynMatrix(int rows, int cols, double fillValue) {
+        this.internalMatrix = new DoubleMatrix(rows, cols);
+        Arrays.fill(internalMatrix.data, fillValue);
+    }
+
     public int numCols() {
         return internalMatrix.getColumns();
     }

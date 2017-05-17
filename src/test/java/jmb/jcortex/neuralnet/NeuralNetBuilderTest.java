@@ -26,11 +26,13 @@ public class NeuralNetBuilderTest {
                 .withWeightInitializer(weightInitializer)
                 .withActivationFunction(SIGMOID_MATRIX_FUNCTION)
                 .withOutputFunction(LINEAR_MATRIX_FUNCTION)
+                .withDropout(0.5)
                 .build();
 
         assertThat(neuralNet.getWeightInitializer()).isSameAs(weightInitializer);
         assertThat(neuralNet.getActivationFunction()).isSameAs(SIGMOID_MATRIX_FUNCTION);
         assertThat(neuralNet.getOutputFunction()).isSameAs(LINEAR_MATRIX_FUNCTION);
+        assertThat(neuralNet.getHiddenDropoutPercent()).isEqualTo(0.5);
         List<SynMatrix> layers = neuralNet.getLayers();
         assertThat(layers).hasSize(3);
         assertThat(layers.get(0).numRows()).isEqualTo(9);   // + 1 for bias node

@@ -23,6 +23,8 @@ public class NeuralNetBuilder {
     private DifferentiableMatrixFunction outputFunction;
     private WeightInitializer weightInitializer;
 
+    private double hiddenDropoutPercent = 0.0;
+
     public NeuralNetBuilder withDimensions(int... dimensions) {
         this.dimensions = dimensions;
 
@@ -53,11 +55,17 @@ public class NeuralNetBuilder {
         return this;
     }
 
+    public NeuralNetBuilder withDropout(double hiddenDropoutPercent) {
+        this.hiddenDropoutPercent = hiddenDropoutPercent;
+        return this;
+    }
+
     public NeuralNet build() {
         NeuralNet neuralNet = new NeuralNet(dimensions);
         neuralNet.setActivationFunction(activationFunction);
         neuralNet.setOutputFunction(outputFunction);
         neuralNet.setWeightInitializer(weightInitializer);
+        neuralNet.setHiddenDropoutPercent(hiddenDropoutPercent);
         return neuralNet;
     }
 

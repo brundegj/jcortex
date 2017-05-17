@@ -13,6 +13,7 @@ import jmb.jcortex.strategies.weightinitializers.WeightInitializer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -24,15 +25,11 @@ public class NeuralNet implements Copyable<NeuralNet> {
     private DifferentiableMatrixFunction outputFunction;
     private WeightInitializer weightInitializer;
 
-    public NeuralNet(List<SynMatrix> layers) {
-        this.layers = layers;
-    }
+    private Random dropoutRandomizer = new Random();
+    private List<SynMatrix> dropoutMasks = new ArrayList<>();
+    private double hiddenDropoutPercent = 0.0;
 
     public NeuralNet(int... dimensions) {
-        if (dimensions.length < 2) {
-            throw new IllegalArgumentException("Must have at least 2 layers in a NeuralNet");
-        }
-
         layers = new ArrayList<>();
         for (int i = 1; i < dimensions.length; i++) {
             int input = dimensions[i-1];
@@ -44,6 +41,47 @@ public class NeuralNet implements Copyable<NeuralNet> {
 
     private void initializeWeights() {
         layers = layers.parallelStream().map(weightInitializer::initialize).collect(toList());
+    }
+
+    public List<SynMatrix> trainForward(DataSet batch) {
+        return doForwardPass(batch, true);
+    }
+
+    private List<SynMatrix> doForwardPass(DataSet dataSet, boolean isTraining) {
+        List<SynMatrix> nodeValues = new ArrayList<>();
+        dropoutMasks = new ArrayList<>();
+        SynMatrix inputs = dataSet.getFeatures();
+        nodeValues.add(inputs);
+        IntStream.range(0, layers.size()).forEach(index -> {
+            SynMatrix nodeVector = nodeValues.get(index).addBiasColumn().multiply(layers.get(index));
+            if (index < layers.size()-1) {
+                nodeVector = nodeVector.apply(activationFunction.getFunction());
+                SynMatrix dropoutMask = getDropoutMask(nodeVector, isTraining, hiddenDropoutPercent);
+                nodeVector = nodeVector.elementMultInPlace(dropoutMask);
+                dropoutMasks.add(dropoutMask);
+            } else {
+                nodeVector = nodeVector.apply(outputFunction.getFunction());
+            }
+            nodeValues.add(nodeVector);
+        });
+        return nodeValues;
+    }
+
+    private SynMatrix getDropoutMask(SynMatrix nodeVector, boolean isTraining, double dropoutPercent) {
+        if (isTraining) {
+            SynMatrix dropoutMask = new SynMatrix(nodeVector.numRows(), nodeVector.numCols());
+            return dropoutMask.applyInPlace(x -> dropoutRandomizer.nextDouble() < dropoutPercent ? 0 : 1);
+        } else {
+            return new SynMatrix(nodeVector.numRows(), nodeVector.numCols(), 1.0 - dropoutPercent);
+        }
+    }
+
+    /**
+     * Do a forward pass through the given DataSet and return the output vector.
+     */
+    public SynMatrix analyzeData(DataSet dataSet) {
+        List<SynMatrix> nodeValues = doForwardPass(dataSet, false);
+        return nodeValues.get(nodeValues.size() - 1);
     }
 
     public DifferentiableMatrixFunction getActivationFunction() {
@@ -75,6 +113,22 @@ public class NeuralNet implements Copyable<NeuralNet> {
         initializeWeights();
     }
 
+    public Random getDropoutRandomizer() {
+        return dropoutRandomizer;
+    }
+
+    public void setDropoutRandomizer(Random dropoutRandomizer) {
+        this.dropoutRandomizer = dropoutRandomizer;
+    }
+
+    public double getHiddenDropoutPercent() {
+        return hiddenDropoutPercent;
+    }
+
+    public void setHiddenDropoutPercent(double hiddenDropoutPercent) {
+        this.hiddenDropoutPercent = hiddenDropoutPercent;
+    }
+
     public List<SynMatrix> getLayers() {
         return new ArrayList<>(layers);
     }
@@ -83,34 +137,22 @@ public class NeuralNet implements Copyable<NeuralNet> {
         this.layers = layers;
     }
 
-    public List<SynMatrix> doForwardPass(DataSet batch) {
-        List<SynMatrix> nodeValues = new ArrayList<>();
-        nodeValues.add(batch.getFeatures());
-        IntStream.range(0, layers.size()).forEach(index -> {
-            SynMatrix nodeVector = nodeValues.get(index).addBiasColumn().multiply(layers.get(index));
-            if (index < layers.size()-1) {
-                nodeVector = nodeVector.apply(activationFunction.getFunction());
-            } else {
-                nodeVector = nodeVector.apply(outputFunction.getFunction());
-            }
-            nodeValues.add(nodeVector);
-        });
-        return nodeValues;
+    public List<SynMatrix> getDropoutMasks() {
+        return new ArrayList<>(dropoutMasks);
     }
 
-    /**
-     * Do a forward pass through the given DataSet and return the output vector.
-     */
-    public SynMatrix analyzeData(DataSet dataSet) {
-        List<SynMatrix> nodeValues = doForwardPass(dataSet);
-        return nodeValues.get(nodeValues.size() - 1);
+    public void setDropoutMasks(List<SynMatrix> dropoutMasks) {
+        this.dropoutMasks = dropoutMasks;
     }
 
     public NeuralNet copy() {
-        NeuralNet copy = new NeuralNet(this.layers.stream().map(SynMatrix::copy).collect(toList()));
+        NeuralNet copy = new NeuralNet();
+        copy.layers = this.layers.stream().map(SynMatrix::copy).collect(toList());
+        copy.dropoutMasks = this.dropoutMasks.stream().map(SynMatrix::copy).collect(toList());
         copy.activationFunction = this.activationFunction;
         copy.outputFunction = this.outputFunction;
         copy.weightInitializer = this.weightInitializer;
+        copy.hiddenDropoutPercent = this.hiddenDropoutPercent;
         return copy;
     }
 
