@@ -13,13 +13,9 @@ import org.knowm.xchart.style.XYStyler;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.toList;
 import static jmb.jcortex.JCortexConstants.TRAINING_SET_PERCENT_WRONG;
 import static jmb.jcortex.JCortexConstants.VALIDATION_SET_PERCENT_WRONG;
 
@@ -80,7 +76,7 @@ public class ChartingPerformanceListener implements PerformanceListener {
 
         XYStyler styler = chart.getStyler();
         styler.setXAxisMin(0.0);
-        styler.setXAxisMax(100.0);
+        styler.setXAxisMax((double)numIterations);
         styler.setYAxisMin(0.0);
         styler.setYAxisMax(100.0);
         chart.addSeries("Training Set", iterations, trainingPercentError);

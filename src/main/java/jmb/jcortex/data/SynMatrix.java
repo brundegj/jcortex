@@ -97,6 +97,10 @@ public class SynMatrix implements Copyable<SynMatrix>, Serializable {
         return Arrays.stream(internalMatrix.toArray2());
     }
 
+    public Stream<double[]> getStreamOfCols() {
+        return this.transpose().getStreamOfRows();
+    }
+
     public SynMatrix sliceRows(int startRow, int endRow) {
         return new SynMatrix(internalMatrix.getRows(new IntervalRange(startRow, endRow)));
     }
@@ -352,7 +356,43 @@ public class SynMatrix implements Copyable<SynMatrix>, Serializable {
         return matrixFunction.apply(this);
     }
 
-    @Override
+    /**
+   	 * Returns a vector of the sum of the cells in each column. Vector size is numCols x 1;
+   	 */
+   	public SynMatrix sumColumns() {
+   	    double[] colSums = new double[numCols()];
+        for (int i = 0; i < colSums.length; i++) {
+            colSums[i] = getColStream(i).sum();
+        }
+        return new SynMatrix(colSums);
+   	}
+
+   	/**
+   	 * Returns a vector of the sum of the cells in each row. Vector size is numRows x 1;
+   	 */
+    public SynMatrix sumRows() {
+   	    double[] rowSums = new double[numRows()];
+        for (int i = 0; i < rowSums.length; i++) {
+            rowSums[i] = getRowStream(i).sum();
+        }
+        return new SynMatrix(rowSums);
+   	}
+
+    /**
+   	 * Returns a vector of the mean value of the cells in each column. Vector size is numCols x 1;
+   	 */
+   	public SynMatrix getColMeans() {
+   	    return sumColumns().applyInPlace(x -> x/numRows());
+   	}
+
+   	/**
+   	 * Returns a vector of the mean value of the cells in each row. Vector size is numRows x 1;
+   	 */
+    public SynMatrix getRowMeans() {
+        return sumRows().applyInPlace(x -> x/numCols());
+   	}
+
+   	@Override
     public String toString() {
         return internalMatrix.toString();
     }

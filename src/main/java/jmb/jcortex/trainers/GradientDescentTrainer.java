@@ -18,6 +18,12 @@ import jmb.jcortex.strategies.regularization.WeightAdjuster;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * A trainer for neural nets that uses gradient descent as the minimization function. Contains hooks to allow
+ * different optimizations and regularizations.
+ *
+ * Use GradientDescentTrainerBuilder to conveniently create and configure an instance of this trainer.
+ */
 public class GradientDescentTrainer implements SupervisedTrainer {
 
     private BatchingStrategy batchingStrategy;

@@ -487,4 +487,66 @@ public class SynMatrixTest {
         assertThat(result.getRow(1)).containsExactly(new double[]{6, 8}, precision);
     }
 
+    @Test
+    public void sumRows_ReturnsVectorOfSums() {
+        double[][] values = new double[][] {
+                {1, 2},
+                {3, 4},
+                {5, 6}
+        };
+        SynMatrix synMatrix = new SynMatrix(values);
+        SynMatrix sums = synMatrix.sumRows();
+        assertThat(sums.numRows()).isEqualTo(3);
+        assertThat(sums.numCols()).isEqualTo(1);
+        assertThat(sums.get(0, 0)).isEqualTo(3);
+        assertThat(sums.get(1, 0)).isEqualTo(7);
+        assertThat(sums.get(2, 0)).isEqualTo(11);
+    }
+
+    @Test
+    public void sumCols_ReturnsVectorOfSums() {
+        double[][] values = new double[][] {
+                {1, 2, 3},
+                {4, 5, 6}
+        };
+        SynMatrix synMatrix = new SynMatrix(values);
+        SynMatrix sums = synMatrix.sumColumns();
+        assertThat(sums.numRows()).isEqualTo(3);
+        assertThat(sums.numCols()).isEqualTo(1);
+        assertThat(sums.get(0, 0)).isEqualTo(5);
+        assertThat(sums.get(1, 0)).isEqualTo(7);
+        assertThat(sums.get(2, 0)).isEqualTo(9);
+    }
+
+    @Test
+    public void getRowMeans_ReturnsVectorOfMeans() {
+        double[][] values = new double[][] {
+                {1, 2},
+                {3, 4},
+                {5, 6}
+        };
+        SynMatrix synMatrix = new SynMatrix(values);
+        SynMatrix sums = synMatrix.getRowMeans();
+        assertThat(sums.numRows()).isEqualTo(3);
+        assertThat(sums.numCols()).isEqualTo(1);
+        assertThat(sums.get(0, 0)).isEqualTo(1.5);
+        assertThat(sums.get(1, 0)).isEqualTo(3.5);
+        assertThat(sums.get(2, 0)).isEqualTo(5.5);
+    }
+
+    @Test
+    public void getColMeans_ReturnsVectorOfMeans() {
+        double[][] values = new double[][] {
+                {1, 2, 3},
+                {4, 5, 6}
+        };
+        SynMatrix synMatrix = new SynMatrix(values);
+        SynMatrix sums = synMatrix.getColMeans();
+        assertThat(sums.numRows()).isEqualTo(3);
+        assertThat(sums.numCols()).isEqualTo(1);
+        assertThat(sums.get(0, 0)).isEqualTo(2.5);
+        assertThat(sums.get(1, 0)).isEqualTo(3.5);
+        assertThat(sums.get(2, 0)).isEqualTo(4.5);
+    }
+
 }

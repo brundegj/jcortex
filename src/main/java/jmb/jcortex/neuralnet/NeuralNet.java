@@ -18,6 +18,13 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * A representation of a neural net (actually a multi-layered perceptron). Stores the weights between layers as
+ * a list of matrices. Also holds the activation and output functions. Implements Copyable to allow deep copies to
+ * be saved during training.
+ *
+ * Use NeuralNetBuilder for a convenient syntax for creating and configuring instances.
+ */
 public class NeuralNet implements Copyable<NeuralNet> {
 
     private List<SynMatrix> layers;
