@@ -28,13 +28,11 @@ public class ChartingPerformanceListener implements PerformanceListener {
     private List<Double> trainingPercentError = new ArrayList<>();
     private List<Double> validationPercentError = new ArrayList<>();
     private XChartPanel<XYChart> chartPanel;
+    private String title;
     private int numIterations;
 
-    public ChartingPerformanceListener() {
-        this.numIterations = 1;
-    }
-
-    public ChartingPerformanceListener(int numIterations) {
+    public ChartingPerformanceListener(String title, int numIterations) {
+        this.title = title;
         this.numIterations = numIterations;
     }
 
@@ -84,7 +82,7 @@ public class ChartingPerformanceListener implements PerformanceListener {
 
         chartPanel = new XChartPanel<>(chart);
         try {
-            JFrame chartUI = new JFrame("Training Performance");
+            JFrame chartUI = new JFrame(title);
             SwingUtilities.invokeAndWait(() -> {
                 chartUI.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 chartUI.add(chartPanel);

@@ -47,8 +47,8 @@ public class MnistOvertrainingDemo {
         DataSet validation = sets[1];
         DataSet test = sets[2];
 
-        NeuralNet trainedNoRegularization = trainWithoutRegularization(training, getHaltingStrategy(training, validation));
-        NeuralNet trainedWithRegularization = trainWithRegularization(training, getHaltingStrategy(training, validation));
+        NeuralNet trainedNoRegularization = trainWithoutRegularization(training, getHaltingStrategy("MNIST training WITHOUT regularization", training, validation));
+        NeuralNet trainedWithRegularization = trainWithRegularization(training, getHaltingStrategy("MNIST training WITH regularization", training, validation));
 
         // Report the performance on the test set
         ClassificationPerformanceEvaluator performanceEvaluator = new ClassificationPerformanceEvaluator();
@@ -95,12 +95,12 @@ public class MnistOvertrainingDemo {
         return noRegularizationTrainer.train(noRegularization, training);
     }
 
-    private HaltingStrategy getHaltingStrategy(DataSet training, DataSet validation) {
+    private HaltingStrategy getHaltingStrategy(String title, DataSet training, DataSet validation) {
         ClassificationPerformanceEvaluator performanceEvaluator = new ClassificationPerformanceEvaluator();
         PrintlnPerformanceListener printlnPerformanceListener = new PrintlnPerformanceListener();
-        ValidationSetHaltingStrategy haltingStrategy = new ValidationSetHaltingStrategy(training, validation, performanceEvaluator, 20);
+        ValidationSetHaltingStrategy haltingStrategy = new ValidationSetHaltingStrategy(training, validation, performanceEvaluator, 10);
         haltingStrategy.addPerformanceListener(printlnPerformanceListener);
-        haltingStrategy.addPerformanceListener(new ChartingPerformanceListener(40));
+        haltingStrategy.addPerformanceListener(new ChartingPerformanceListener(title, 40));
         return haltingStrategy;
     }
 
