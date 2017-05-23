@@ -10,8 +10,8 @@ package jmb.jcortex.mapfunctions;
  */
 public class SimpleDifferentiableMatrixFunction implements DifferentiableMatrixFunction {
 
-    private MatrixFunction function;
-    private MatrixFunction derivative;
+    private final MatrixFunction function;
+    private final MatrixFunction derivative;
 
     public SimpleDifferentiableMatrixFunction(DifferentiableFunction differentiableFunction) {
         function = new SimpleMatrixFunction(differentiableFunction.getFunction());

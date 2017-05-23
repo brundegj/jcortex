@@ -14,7 +14,7 @@ import java.util.function.DoubleUnaryOperator;
  */
 public class SimpleMatrixFunction implements MatrixFunction {
 
-    private DoubleUnaryOperator function;
+    private final DoubleUnaryOperator function;
 
     public SimpleMatrixFunction(DoubleUnaryOperator function) {
         this.function = function;
