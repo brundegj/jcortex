@@ -30,7 +30,7 @@ import static jmb.jcortex.mapfunctions.MatrixFunctions.SOFTMAX_MATRIX_FUNCTION;
 
 /**
  *  A Demo to demonstrate overfitting and regularization. Trains a digit recognizer on the MNIST digit data set.
- *  This demo trains with only 2% of the MNIST samples (1200 images) to make the task much harder, thus showing
+ *  This demo trains with only 5% of the MNIST training samples (3000 images) to make the task much harder, thus showing
  *  severe overfitting. A variety of regularization techniques can be combined (L2 weight penalty, dropout,
  *  synthetic training data using gaussian noise) to reduce the overfitting.
  */
@@ -47,8 +47,8 @@ public class MnistOvertrainingDemo {
         DataSet validation = sets[1];
         DataSet test = sets[2];
 
-        NeuralNet trainedNoRegularization = trainWithoutRegularization(training, getHaltingStrategy("MNIST training WITHOUT regularization", training, validation));
-        NeuralNet trainedWithRegularization = trainWithRegularization(training, getHaltingStrategy("MNIST training WITH regularization", training, validation));
+        NeuralNet trainedNoRegularization = trainWithoutRegularization(training, getHaltingStrategy("MNIST training WITHOUT regularization", training, validation, 10));
+        NeuralNet trainedWithRegularization = trainWithRegularization(training, getHaltingStrategy("MNIST training WITH regularization", training, validation, 30));
 
         // Report the performance on the test set
         ClassificationPerformanceEvaluator performanceEvaluator = new ClassificationPerformanceEvaluator();
@@ -77,7 +77,7 @@ public class MnistOvertrainingDemo {
     }
 
     private NeuralNet trainWithRegularization(DataSet training, HaltingStrategy haltingStrategy) {
-        NeuralNet noRegularization = NeuralNetBuilder.createNeuralNet()
+        NeuralNet untrained = NeuralNetBuilder.createNeuralNet()
                 .withDimensions(784, 200, 200, 10)
                 .withActivationFunction(RECIFIED_LINEAR_MATRIX_FUNCTION)
                 .withOutputFunction(SOFTMAX_MATRIX_FUNCTION)
@@ -85,28 +85,29 @@ public class MnistOvertrainingDemo {
                 .withDropout(0.2)   // dropout
                 .build();
 
-        SupervisedTrainer noRegularizationTrainer = GradientDescentTrainerBuilder.createTrainer()
+        SupervisedTrainer trainer = GradientDescentTrainerBuilder.createTrainer()
                 .withBatchingStrategy(new GaussianNoiseBatchingStrategy(100, 0.4, training))    // gaussian noise synthetic data
                 .withOptimizationStrategy(new MomentumOptimizationStrategy(0.08, 0.7))
                 .withHaltingStrategy(haltingStrategy)
                 .withWeightAdjuster(new L2Regularization(0.1))  // L2 weight decay
                 .build();
 
-        return noRegularizationTrainer.train(noRegularization, training);
+        return trainer.train(untrained, training);
     }
 
-    private HaltingStrategy getHaltingStrategy(String title, DataSet training, DataSet validation) {
+    private HaltingStrategy getHaltingStrategy(String title, DataSet training, DataSet validation, int maxIterationSinceBestResult) {
         ClassificationPerformanceEvaluator performanceEvaluator = new ClassificationPerformanceEvaluator();
         PrintlnPerformanceListener printlnPerformanceListener = new PrintlnPerformanceListener();
-        ValidationSetHaltingStrategy haltingStrategy = new ValidationSetHaltingStrategy(training, validation, performanceEvaluator, 10);
+        ValidationSetHaltingStrategy haltingStrategy = new ValidationSetHaltingStrategy(
+                training, validation, performanceEvaluator, maxIterationSinceBestResult);
         haltingStrategy.addPerformanceListener(printlnPerformanceListener);
-        haltingStrategy.addPerformanceListener(new ChartingPerformanceListener(title, 40));
+        haltingStrategy.addPerformanceListener(new ChartingPerformanceListener(title, 30));
         return haltingStrategy;
     }
 
     private DataSet[] loadData() {
         DataSet allMnistDigits = new MnistDigitsDataService().loadDataFile();
-        // Only use 2% of images in the training set (1200 images). This exacerbates overfitting for the demo.
-        return new DataSetSplitter().split(allMnistDigits.shuffleRows(), 0.02, 0.1, 0.1);
+        // Only use 5% of images in the training set (3000 images). This exacerbates overfitting for the demo.
+        return new DataSetSplitter().split(allMnistDigits.shuffleRows(), 0.05, 0.1, 0.1);
     }
 }
