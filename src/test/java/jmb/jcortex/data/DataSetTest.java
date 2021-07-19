@@ -8,6 +8,8 @@ package jmb.jcortex.data;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -78,9 +80,9 @@ public class DataSetTest {
 
         assertThat(shuffled.numRows()).isEqualTo(dataSet.numRows());
         assertThat(shuffledFeatures).isNotEqualTo(originalFeatures);
-        assertThat(shuffledFeatures).containsExactlyInAnyOrder(originalFeatures);
+        assertThat(Arrays.asList(shuffledFeatures)).containsExactlyInAnyOrder(originalFeatures);
         assertThat(shuffledLabels).isNotEqualTo(originalLabels);
-        assertThat(shuffledLabels).containsExactlyInAnyOrder(originalLabels);
+        assertThat(Arrays.asList(shuffledLabels)).containsExactlyInAnyOrder(originalLabels);
     }
 
 }
